@@ -7,14 +7,14 @@ if [ -z "$SERVER_IP_ADDRESS" ]; then
   exit 1
 fi
 
-ip tuntap del mode tun dev tun0
-ip tuntap add mode tun dev tun0
-ip addr add 172.17.0.1/24 dev tun0
-ip link set dev tun0 up
+#ip tuntap del mode tun dev tun0
+#ip tuntap add mode tun dev tun0
+#ip addr add 172.17.0.1/24 dev tun0
+#ip link set dev tun0 up
 
-ip route del default
-ip route add default via 172.17.0.1
-ip route add $SERVER_IP_ADDRESS/32 via 172.16.0.1
+#ip route del default
+#ip route add default via 172.17.0.1
+#ip route add $SERVER_IP_ADDRESS/32 via 172.16.0.1
 
 cat <<EOF > /opt/config.json
 {
@@ -75,5 +75,10 @@ EOF
 echo "Start xray"
 /app/xray run -config /opt/config.json &
 
-echo "Start tun2socks"
-/app/tun2socks -loglevel silent -tcp-sndbuf 3m -tcp-rcvbuf 3m -device tun0 -proxy socks5://127.0.0.1:10808 &
+#echo "Start tun2socks"
+#/app/tun2socks -loglevel silent -tcp-sndbuf 3m -tcp-rcvbuf 3m -device tun0 -proxy socks5://127.0.0.1:10808 &
+echo "Start hev-socks5-tunnel"
+/app/hev-socks5-tunnel hev-socks5-tunnel.yaml &
+ip route add $SERVER_IP_ADDRESS/32 via 172.16.0.1
+ip route del default
+ip route add default via 172.17.0.1

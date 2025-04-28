@@ -1,0 +1,13 @@
+tunnel:
+  name: tun0
+  mtu: 8500
+  multi-queue: false
+  ipv4: 172.17.0.1
+
+socks5:
+  port: 10808
+  address: 127.0.0.1
+  udp: 'udp'
+
+misc:
+  log-level: warn
