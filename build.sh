@@ -3,7 +3,7 @@
 XRAY_LINK="https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-arm64-v8a.zip"
 TUN2SOCKS_LINK="https://github.com/xjasonlyu/tun2socks/releases/latest/download/tun2socks-linux-arm64.zip"
 
-sudo apt -y install unzip
+sudo apt -y install unzip curl
 rm xray
 rm tun2socks
 mkdir tmp
@@ -18,4 +18,4 @@ cd ..
 rm -rf tmp/
 
 docker buildx build -f Dockerfile --no-cache --progress=plain --platform linux/arm64 --output=type=docker --tag savimisha/mikrotik-xray:latest .
-#docker push savimisha/mikrotik-xray:latest
+docker push savimisha/mikrotik-xray:latest
