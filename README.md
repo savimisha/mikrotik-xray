@@ -1,5 +1,5 @@
-Xray-core + tun2socks container for Mikrotik.
-arm64 only.
+Xray-core + hev-socks5-tunnel container for Mikrotik
+arm64 only
 
 Environment:
 ```

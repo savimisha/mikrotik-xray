@@ -7,16 +7,25 @@ if [ -z "$SERVER_IP_ADDRESS" ]; then
   exit 1
 fi
 
-#ip tuntap del mode tun dev tun0
-#ip tuntap add mode tun dev tun0
-#ip addr add 172.17.0.1/24 dev tun0
-#ip link set dev tun0 up
+config_hs5t() {
+cat > config_hs5t.yaml << EOF
+misc:
+  log-level: 'warn'
+tunnel:
+  name: tun0
+  mtu: 9000
+  ipv4: 172.17.0.1
+  post-up-script: route.sh
+socks5:
+  address: 127.0.0.1
+  port: 10808
+  udp: udp
+  mark: 438
+EOF
+}
 
-#ip route del default
-#ip route add default via 172.17.0.1
-#ip route add $SERVER_IP_ADDRESS/32 via 172.16.0.1
-
-cat <<EOF > /opt/config.json
+config_xray() {
+cat <<EOF > config_xray.json
 {
   "log": {
     "loglevel": "warning"
@@ -71,14 +80,23 @@ cat <<EOF > /opt/config.json
   ]
 }
 EOF
+}
 
-echo "Start xray"
-/app/xray run -config /opt/config.json &
+config_route() {
+    echo "#!/bin/sh" > route.sh
+    chmod +x route.sh
+    echo "ip route add $SERVER_IP_ADDRESS/32 via 172.16.0.1" >> route.sh
+    echo "ip route del default" >> route.sh
+    echo "ip route add default via 172.17.0.1" >> route.sh
+}
 
-#echo "Start tun2socks"
-#/app/tun2socks -loglevel silent -tcp-sndbuf 3m -tcp-rcvbuf 3m -device tun0 -proxy socks5://127.0.0.1:10808 &
-echo "Start hev-socks5-tunnel"
-/app/hev-socks5-tunnel hev-socks5-tunnel.yaml &
-ip route add $SERVER_IP_ADDRESS/32 via 172.16.0.1
-ip route del default
-ip route add default via 172.17.0.1
+run() {
+    cd /app
+    config_hs5t
+	config_xray
+	config_route
+	./hev-socks5-tunnel config_hs5t.yaml &
+	./xray run -config config_xray.json
+}
+
+run || exit 1% 
