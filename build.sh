@@ -15,5 +15,5 @@ cp xray ../xray
 cd ..
 rm -rf tmp/
 
-docker buildx build -f Dockerfile --no-cache --progress=plain --platform linux/arm64 --output=type=docker --tag savimisha/mikrotik-xray:dev .
-docker push savimisha/mikrotik-xray:dev
+docker buildx build -f Dockerfile --no-cache --progress=plain --platform linux/arm64 --output=type=docker --tag savimisha/mikrotik-xray .
+docker push savimisha/mikrotik-xray
