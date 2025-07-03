@@ -32,6 +32,16 @@ cat <<EOF > config_xray.json
   },
   "inbounds": [
     {
+      "tag": "dokodemo-door",
+      "port": $DOKODEMO_DOOR_PORT,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "address": "$DOKODEMO_DOOR_ADDRESS",
+        "port": $DOKODEMO_DOOR_PORT,
+        "network": "tcp,udp"
+      }
+    },
+    {
       "port": 10808,
       "listen": "0.0.0.0",
       "protocol": "socks",
@@ -93,10 +103,10 @@ config_route() {
 run() {
     cd /app
     config_hs5t
-	config_xray
-	config_route
-	./hev-socks5-tunnel config_hs5t.yaml &
-	./xray run -config config_xray.json
+    config_xray
+    config_route
+    ./hev-socks5-tunnel config_hs5t.yaml &
+    ./xray run -config config_xray.json
 }
 
 run || exit 1% 
