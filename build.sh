@@ -15,5 +15,6 @@ cp xray ../xray
 cd ..
 rm -rf tmp/
 
+docker run --privileged --rm tonistiigi/binfmt --install all
 docker buildx build -f Dockerfile --no-cache --progress=plain --platform linux/arm64 --output=type=docker --tag savimisha/mikrotik-xray .
 docker push savimisha/mikrotik-xray
