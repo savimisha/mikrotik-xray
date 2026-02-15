@@ -25,16 +25,19 @@ cat <<EOF > config_xray.json
       }
     },
     {
+      "tag": "socks",
       "port": 10808,
       "listen": "0.0.0.0",
       "protocol": "socks",
       "settings": {
-        "udp": true
+        "udp": true,
+        "auth": "noauth",
+        "allowTransparent": false
       },
       "sniffing": {
         "enabled": true,
         "destOverride": ["http", "tls", "quic"],
-	"routeOnly": true
+        "routeOnly": false
       }
     },
     {
@@ -48,7 +51,7 @@ cat <<EOF > config_xray.json
       "sniffing": {
         "enabled": true,
         "destOverride": ["http", "tls", "quic"],
-        "routeOnly": true
+        "routeOnly": false
       }
     }
   ],
@@ -82,7 +85,7 @@ cat <<EOF > config_xray.json
           "shortId": "$SID"
         }
       },
-	  "tag": "proxy"
+     "tag": "proxy"
     }
   ]
 }
