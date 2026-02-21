@@ -1,5 +1,5 @@
-Xray-core + hev-socks5-tunnel container for Mikrotik
-arm64 only
+Xray-core container for Mikrotik
+arm & arm64 only
 
 Environment:
 ```
