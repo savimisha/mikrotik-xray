@@ -57,6 +57,7 @@ cat <<EOF > config_xray.json
   ],
   "outbounds": [
     {
+      "tag": "proxy",
       "protocol": "vless",
       "settings": {
         "vnext": [
@@ -66,9 +67,7 @@ cat <<EOF > config_xray.json
             "users": [
               {
                 "id": "$USER_ID",
-                "security": "auto",
                 "encryption": "none",
-                "alterId": 0,
                 "flow": "xtls-rprx-vision"
               }
             ]
@@ -79,13 +78,33 @@ cat <<EOF > config_xray.json
         "network": "raw",
         "security": "reality",
         "realitySettings": {
-          "fingerprint": "chrome",
+          "fingerprint": "random",
           "serverName": "$SNI",
           "publicKey": "$PBK",
           "shortId": "$SID"
+        },
+        "sockopt": {
+          $([ "$FRAGMENT_ENABLE" = "true" ] && ( echo "\"dialerProxy\": \"fragment-proxy\"") || ( echo ""))
         }
-      },
-     "tag": "proxy"
+      }
+    },
+    {
+      "tag": "fragment-proxy",
+      "protocol": "freedom",
+      "settings": {
+        "noises": [
+          {
+            "type": "$NOISES_TYPE",
+            "delay": "$NOISES_DELAY",
+            "packet": "$NOISES_PACKET"
+          }
+        ],
+        "fragment": {
+          "length": "$FRAGMENT_LENGTH",
+          "packets": "tlshello",
+          "interval": "$FRAGMENT_INTERVAL"
+        }
+      }
     }
   ]
 }

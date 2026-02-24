@@ -1,5 +1,7 @@
 FROM alpine:latest AS build
+
 ARG TARGETPLATFORM
+
 ARG XRAY_ARM="https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-arm32-v7a.zip"
 ARG XRAY_ARM64="https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-arm64-v8a.zip"
 
@@ -7,9 +9,11 @@ RUN set ex;
 
 RUN apk add --no-cache curl unzip
 
-RUN if [[ "$TARGETPLATFORM" == "linux/arm64" ]]; then \
-    curl -L -o /xray.zip $XRAY_ARM64; else \
+RUN if [[ "$TARGETPLATFORM" == "linux/arm/v7" ]]; then \
     curl -L -o /xray.zip $XRAY_ARM; fi
+
+RUN if [[ "$TARGETPLATFORM" == "linux/arm64" ]]; then \
+    curl -L -o /xray.zip $XRAY_ARM64; fi
 
 RUN unzip /xray.zip
 
