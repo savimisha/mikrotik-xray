@@ -1,5 +1,5 @@
 Xray-core container for Mikrotik
-arm & arm64 only
+arm & arm64
 
 Environment:
 ```
