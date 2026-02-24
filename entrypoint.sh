@@ -11,19 +11,23 @@ config_xray() {
 cat <<EOF > config_xray.json
 {
   "log": {
-    "loglevel": "warning"
+    "loglevel": $([ -z $LOG_LEVEL ] && (echo "\"warning\"") || (echo "$LOG_LEVEL"))
   },
   "inbounds": [
-    {
-      "tag": "dokodemo-door",
-      "port": $DOKODEMO_DOOR_PORT,
-      "protocol": "dokodemo-door",
-      "settings": {
-        "address": "$DOKODEMO_DOOR_ADDRESS",
-        "port": $DOKODEMO_DOOR_PORT,
-        "network": "tcp,udp"
-      }
-    },
+    $(
+        if [ ! -z $DOKODEMO_DOOR_PORT ]; then
+            echo "{"
+            echo "\"tag\": \"dokodemo-door\"",
+            echo "\"port\": $DOKODEMO_DOOR_PORT",
+            echo "\"protocol\": \"dokodemo-door\"",
+            echo "\"settings\": {"
+            echo "\"address\": \"$DOKODEMO_DOOR_ADDRESS\"",
+            echo "\"port\": $DOKODEMO_DOOR_PORT",
+            echo "\"network\": \"tcp,udp\""
+            echo "}"
+            echo "},"
+        fi
+    )
     {
       "tag": "socks",
       "port": 10808,
@@ -82,27 +86,6 @@ cat <<EOF > config_xray.json
           "serverName": "$SNI",
           "publicKey": "$PBK",
           "shortId": "$SID"
-        },
-        "sockopt": {
-          $([ "$FRAGMENT_ENABLE" = "true" ] && ( echo "\"dialerProxy\": \"fragment-proxy\"") || ( echo ""))
-        }
-      }
-    },
-    {
-      "tag": "fragment-proxy",
-      "protocol": "freedom",
-      "settings": {
-        "noises": [
-          {
-            "type": "$NOISES_TYPE",
-            "delay": "$NOISES_DELAY",
-            "packet": "$NOISES_PACKET"
-          }
-        ],
-        "fragment": {
-          "length": "$FRAGMENT_LENGTH",
-          "packets": "tlshello",
-          "interval": "$FRAGMENT_INTERVAL"
         }
       }
     }
