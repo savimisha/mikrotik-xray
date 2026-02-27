@@ -7,6 +7,23 @@ if [ -z "$SERVER_IP_ADDRESS" ]; then
   exit 1
 fi
 
+config_hs5t() {
+cat > config_hs5t.yaml << EOF
+misc:
+  log-level: 'warn'
+tunnel:
+  name: tun0
+  mtu: 9000
+  ipv4: 172.17.0.1
+  post-up-script: route.sh
+socks5:
+  address: 127.0.0.1
+  port: 10808
+  udp: udp
+  mark: 438
+EOF
+}
+
 config_xray() {
 cat <<EOF > config_xray.json
 {
@@ -37,20 +54,6 @@ cat <<EOF > config_xray.json
         "udp": true,
         "auth": "noauth",
         "allowTransparent": false
-      },
-      "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls", "quic"],
-        "routeOnly": false
-      }
-    },
-    {
-      "tag": "tun",
-      "port": 0,
-      "protocol": "tun",
-      "settings": {
-        "name": "xray0",
-        "MTU": 1500
       },
       "sniffing": {
         "enabled": true,
@@ -94,28 +97,21 @@ cat <<EOF > config_xray.json
 EOF
 }
 
+config_route() {
+    echo "#!/bin/sh" > route.sh
+    chmod +x route.sh
+    echo "ip route add $SERVER_IP_ADDRESS/32 via 172.16.0.1" >> route.sh
+    echo "ip route del default" >> route.sh
+    echo "ip route add default via 172.17.0.1" >> route.sh
+}
+
 run() {
     cd /app
-
+    config_hs5t
     config_xray
-
-    ip route add $SERVER_IP_ADDRESS/32 via 172.16.0.1
-
-    ./xray run -config config_xray.json &
-
-    while true; do
-        if [ "$(ifconfig | grep xray0)" != "" ]; then
-            break
-        fi
-        echo "Awaiting xray0 tun interface..."
-        sleep 1
-    done
-
-    ip addr add 172.17.0.1/24 dev xray0
-    ip route del default
-    ip route add default via 172.17.0.1
-
-    tail -f /dev/null
+    config_route
+    ./hev-socks5-tunnel config_hs5t.yaml &
+    ./xray run -config config_xray.json
 }
 
 run || exit 1%
