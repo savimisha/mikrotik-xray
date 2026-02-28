@@ -11,23 +11,25 @@ config_xray() {
 cat <<EOF > config_xray.json
 {
   "log": {
-    "loglevel": $([ -z $LOG_LEVEL ] && (echo "\"warning\"") || (echo "$LOG_LEVEL"))
+    "loglevel": $(if [ -z $LOG_LEVEL ]; then
+                   echo "\"warning\""
+                else
+                   echo "$LOG_LEVEL"
+                fi)
   },
   "inbounds": [
-    $(
-        if [ ! -z $DOKODEMO_DOOR_PORT ]; then
-            echo "{"
-            echo "\"tag\": \"dokodemo-door\"",
-            echo "\"port\": $DOKODEMO_DOOR_PORT",
-            echo "\"protocol\": \"dokodemo-door\"",
-            echo "\"settings\": {"
-            echo "\"address\": \"$DOKODEMO_DOOR_ADDRESS\"",
-            echo "\"port\": $DOKODEMO_DOOR_PORT",
-            echo "\"network\": \"tcp,udp\""
-            echo "}"
-            echo "},"
-        fi
-    )
+    $(if [ ! -z $DOKODEMO_DOOR_PORT ]; then
+        echo "{"
+        echo "\"tag\": \"dokodemo-door\"",
+        echo "\"port\": $DOKODEMO_DOOR_PORT",
+        echo "\"protocol\": \"dokodemo-door\"",
+        echo "\"settings\": {"
+        echo "\"address\": \"$DOKODEMO_DOOR_ADDRESS\"",
+        echo "\"port\": $DOKODEMO_DOOR_PORT",
+        echo "\"network\": \"tcp,udp\""
+        echo "}"
+        echo "},"
+    fi)
     {
       "tag": "socks",
       "port": 10808,
@@ -72,14 +74,23 @@ cat <<EOF > config_xray.json
               {
                 "id": "$USER_ID",
                 "encryption": "none",
-                "flow": "xtls-rprx-vision"
+                $(if [ -z $XHTTP_PATH ]; then
+                  echo "\"flow\": \"xtls-rprx-vision\""
+                else
+                  echo "\"flow\": \"\""
+                fi)
               }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "raw",
+        $(if [ -z $XHTTP_PATH ]; then
+            echo "\"network\": \"raw\","
+        else
+            echo "\"network\": \"xhttp\","
+            echo "\"xhttpSettings\": { \"mode\": \"auto\", \"host\": \"\", \"path\":\"$XHTTP_PATH\" },"
+        fi)
         "security": "reality",
         "realitySettings": {
           "fingerprint": "random",
