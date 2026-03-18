@@ -41,9 +41,7 @@ cat <<EOF > config_xray.json
         "allowTransparent": false
       },
       "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls", "quic"],
-        "routeOnly": false
+        "enabled": false
       }
     },
     {
@@ -55,9 +53,7 @@ cat <<EOF > config_xray.json
         "MTU": 1500
       },
       "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls", "quic"],
-        "routeOnly": false
+        "enabled": false
       }
     }
   ],
