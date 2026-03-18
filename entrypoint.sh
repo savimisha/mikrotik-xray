@@ -58,9 +58,7 @@ cat <<EOF > config_xray.json
         "allowTransparent": false
       },
       "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls", "quic"],
-        "routeOnly": false
+        "enabled": false
       }
     }
   ],
