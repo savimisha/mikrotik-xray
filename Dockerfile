@@ -19,7 +19,7 @@ RUN if [[ "$TARGETPLATFORM" == "linux/arm64" ]]; then \
 
 RUN unzip /xray.zip
 
-FROM alpine:latest
+FROM busybox:uclibc
 
 WORKDIR /app
 
